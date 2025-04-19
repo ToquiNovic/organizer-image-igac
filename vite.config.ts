@@ -12,8 +12,8 @@ export default defineConfig({
     VitePWA({
       manifest: {
         display: 'standalone',
-				display_override: ['window-controls-overlay'],
-				lang: 'es-ES',
+        display_override: ['window-controls-overlay'],
+        lang: 'es-ES',
         name: "Image Organizer",
         short_name: "Organizer",
         description: "Aplicacion para organizar imágenes en carpetas segun el instructivo",
@@ -32,6 +32,9 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+      }
     }),
   ],
   resolve: {

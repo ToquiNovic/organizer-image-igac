@@ -3,7 +3,7 @@ import { Button } from "../components/ui/button";
 import { CardContent } from "../components/ui/card";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import workerSrc from "pdfjs-dist/build/pdf.worker.entry"; // Usa el alias definido en vite.config.ts
+import workerSrc from "pdfjs-dist/build/pdf.worker.entry";
 
 // Estilos del visor PDF
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -35,8 +35,8 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
     const scrollPositionRef = useRef<number>(0);
 
     // Dimensiones fijas para el contenedor
-    const FIXED_WIDTH = 800; // Ancho fijo cuando la rotación es 0° o 180°
-    const FIXED_HEIGHT = 600; // Alto fijo cuando la rotación es 0° o 180°
+    const FIXED_WIDTH = 800;
+    const FIXED_HEIGHT = 600;
 
     // Normalizar el valor de rotation para que esté entre 0 y 360
     const normalizedRotation = rotation % 360;
@@ -55,7 +55,7 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
 
       // Asignar dimensiones fijas según la rotación
       if (isRotated90or270) {
-        container.style.width = `${FIXED_HEIGHT}px`; // Intercambiar ancho y alto
+        container.style.width = `${FIXED_HEIGHT}px`;
         container.style.height = `${FIXED_WIDTH}px`;
       } else {
         container.style.width = `${FIXED_WIDTH}px`;
@@ -63,7 +63,7 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
       }
 
       // Forzar repintado sin cambiar la visibilidad
-      void container.getBoundingClientRect(); // Forzar reflow sin afectar display
+      void container.getBoundingClientRect(); 
     }, [normalizedRotation]);
 
     // Restaurar la posición de desplazamiento después del re-renderizado
