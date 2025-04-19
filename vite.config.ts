@@ -35,6 +35,26 @@ export default defineConfig({
             type: "image/png",
             purpose: "any",
           },
+          {
+            src: "pwa-144x144.png",
+            sizes: "144x144",
+            type: "image/png",
+            purpose: "any",
+          },
+        ],
+        screenshots: [
+          {
+            src: "screenshot1.png",
+            sizes: "1280x720",
+            type: "image/png",
+            form_factor: "wide",
+          },
+          {
+            src: "screenshot2.png",
+            sizes: "1280x720",
+            type: "image/png",
+            form_factor: "narrow",
+          },
         ],
       },
       workbox: {

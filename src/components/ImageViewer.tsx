@@ -5,6 +5,20 @@ import { CardContent } from "../components/ui/card";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import workerSrc from "pdfjs-dist/build/pdf.worker.entry";
+import {
+  CircleArrowLeft,
+  CircleArrowRight,
+  RotateCcw,
+  RotateCw,
+  ScanEye,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
 
 // Estilos del visor PDF
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -107,19 +121,73 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
         <CardContent className="flex flex-col items-center w-full space-y-4">
           {/* Botones */}
           <div className="flex flex-wrap justify-center gap-4">
-            <Button onClick={handlePrev}>Anterior</Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handlePrev}>
+                  <CircleArrowLeft />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Anterior</TooltipContent>
+            </Tooltip>
+
             {!isPdf && (
               <>
-                <Button onClick={handleRotateLeft}>Rotar Izquierda</Button>
-                <Button onClick={handleRotateRight}>Rotar Derecha</Button>
-                <Button onClick={handleZoomOut}>- Zoom</Button>
-                <Button onClick={handleResetZoom}>Reset Zoom</Button>
-                <Button onClick={handleZoomIn}>+ Zoom</Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleRotateLeft}>
+                      <RotateCcw />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Rotar Izquierda</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleRotateRight}>
+                      <RotateCw />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Rotar Derecha</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleZoomOut}>
+                      <ZoomOut />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Alejar</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleResetZoom}>
+                      <ScanEye />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Restablecer Zoom</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleZoomIn}>
+                      <ZoomIn />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Acercar</TooltipContent>
+                </Tooltip>
               </>
             )}
-            <Button onClick={handleNext}>Siguiente</Button>
-          </div>
 
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleNext}>
+                  <CircleArrowRight />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Siguiente</TooltipContent>
+            </Tooltip>
+          </div>
           {/* Contenedor de la imagen o PDF */}
           {imageUrl ? (
             isPdf ? (

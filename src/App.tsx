@@ -15,6 +15,7 @@ import {
 } from "./utils";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { toast, Toaster } from "sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 function App() {
   const [origenFiles, setOrigenFiles] = useState<File[]>([]);
@@ -169,68 +170,72 @@ function App() {
 
   return (
     <div className="grid h-screen p-6 gap-6">
-      <Toaster richColors position="top-right" />
-      <Card className="start-panel">
-        <CardHeader>
-          <CardTitle>Panel de Inicio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <FileSelectors
-                onOrigenChange={handleOrigenChange}
-                onExcelChange={handleExcelChange}
-                origenCount={origenFiles.length}
-                excelFile={excelFile}
-              />
-            </div>
-            <div className="col-span-1">
-              <ColumnSelector
-                excelColumns={excelColumns}
-                selectedColumn={selectedColumn}
-                onSelect={handleColumnSelect}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <div className="grid grid-cols-3 gap-6">
-        <Card className="col-span-2 image-preview">
+      <TooltipProvider>
+        <Toaster richColors position="top-right" />
+        <Card className="start-panel">
           <CardHeader>
-            <CardTitle className="text-white">Vista Previa de Imagen</CardTitle>
+            <CardTitle>Panel de Inicio</CardTitle>
           </CardHeader>
           <CardContent>
-            <ImageViewer
-              imageUrl={imageUrl}
-              isPdf={currentFile?.name.toLowerCase().endsWith(".pdf")}
-              onRotateLeft={handleRotateLeft}
-              onRotateRight={handleRotateRight}
-              onPrev={handlePrev}
-              onNext={handleNext}
-              rotation={rotation}
-            />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2">
+                <FileSelectors
+                  onOrigenChange={handleOrigenChange}
+                  onExcelChange={handleExcelChange}
+                  origenCount={origenFiles.length}
+                  excelFile={excelFile}
+                />
+              </div>
+              <div className="col-span-1">
+                <ColumnSelector
+                  excelColumns={excelColumns}
+                  selectedColumn={selectedColumn}
+                  onSelect={handleColumnSelect}
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="predio-panel">
-          <CardHeader>
-            <CardTitle>Panel de Predios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PredioPanel
-              predios={predios}
-              onSave={handleOrganize}
-              category={category}
-              setCategory={setCategory}
-              unidad={unidad}
-              setUnidad={setUnidad}
-              organizedFiles={organizedFiles}
-              showDuplicateDialog={showDuplicateDialog}
-              setShowDuplicateDialog={setShowDuplicateDialog}
-            />
-          </CardContent>
-        </Card>
-      </div>
-      <FolderPreview organizedFiles={organizedFiles} />
+        <div className="grid grid-cols-3 gap-6">
+          <Card className="col-span-2 image-preview">
+            <CardHeader>
+              <CardTitle className="text-white">
+                Vista Previa de Imagen
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ImageViewer
+                imageUrl={imageUrl}
+                isPdf={currentFile?.name.toLowerCase().endsWith(".pdf")}
+                onRotateLeft={handleRotateLeft}
+                onRotateRight={handleRotateRight}
+                onPrev={handlePrev}
+                onNext={handleNext}
+                rotation={rotation}
+              />
+            </CardContent>
+          </Card>
+          <Card className="predio-panel">
+            <CardHeader>
+              <CardTitle>Panel de Predios</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PredioPanel
+                predios={predios}
+                onSave={handleOrganize}
+                category={category}
+                setCategory={setCategory}
+                unidad={unidad}
+                setUnidad={setUnidad}
+                organizedFiles={organizedFiles}
+                showDuplicateDialog={showDuplicateDialog}
+                setShowDuplicateDialog={setShowDuplicateDialog}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <FolderPreview organizedFiles={organizedFiles} />
+      </TooltipProvider>
     </div>
   );
 }
