@@ -11,30 +11,35 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       manifest: {
-        display: 'standalone',
-        display_override: ['window-controls-overlay'],
-        lang: 'es-ES',
+        display: "standalone",
+        display_override: ["window-controls-overlay"],
+        lang: "es-ES",
         name: "Image Organizer",
         short_name: "Organizer",
-        description: "Aplicacion para organizar imágenes en carpetas segun el instructivo",
+        description:
+          "Aplicacion para organizar imágenes en carpetas segun el instructivo",
         theme_color: "#ffffff",
-        background_color: '#d4d4d4',
+        background_color: "#d4d4d4",
+        start_url: "/",
+        id: "/",
         icons: [
           {
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any",
           },
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
-      }
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      },
     }),
   ],
   resolve: {

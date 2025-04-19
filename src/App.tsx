@@ -4,6 +4,7 @@ import {
   FileSelectors,
   ImageViewer,
   PredioPanel,
+  FolderPreview,
 } from "./components";
 import {
   readExcelColumns,
@@ -12,13 +13,8 @@ import {
   OrganizedFile,
   checkUnidadExists,
 } from "./utils";
-import { SUBCARPETAS } from "./utils/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { Separator } from "./components/ui/separator";
-import { Button } from "./components/ui/button";
-import { Toaster, toast } from "sonner";
-import { zipSync } from "fflate";
-import { saveAs } from "file-saver";
+import { toast, Toaster } from "sonner";
 
 function App() {
   const [origenFiles, setOrigenFiles] = useState<File[]>([]);
@@ -124,9 +120,6 @@ function App() {
       }
 
       try {
-        console.log(
-          `Intentando organizar: predio=${predio}, unidad=${unidad}, categoría=${category}`
-        );
         const unidadExists = checkUnidadExists(
           predio,
           category,
@@ -134,9 +127,6 @@ function App() {
           organizedFiles
         );
         if (unidadExists) {
-          console.log(
-            `Unidad ${unidad} ya existe para predio ${predio}, abriendo diálogo`
-          );
           setShowDuplicateDialog(predio);
           return;
         }
@@ -149,10 +139,6 @@ function App() {
         );
         setOrganizedFiles((prev) => {
           const newFiles = [...prev, organizedFile];
-          console.log(
-            "Archivos organizados actualizados:",
-            newFiles.map((f) => f.path)
-          );
           return newFiles;
         });
         handleNext();
@@ -177,44 +163,6 @@ function App() {
       handleNext,
     ]
   );
-
-  const handleDownloadZip = useCallback(async () => {
-    if (organizedFiles.length === 0) {
-      toast.error("No hay archivos organizados", {
-        description: "Organiza al menos un archivo antes de descargar.",
-      });
-      return;
-    }
-
-    const zipData: { [key: string]: Uint8Array } = {};
-    const prediosSet = new Set(organizedFiles.map((f) => f.path.split("/")[0]));
-
-    for (const predio of prediosSet) {
-      for (const sub of SUBCARPETAS) {
-        const folderPath = `${predio}/${sub}/`;
-        if (!zipData[folderPath]) {
-          zipData[folderPath] = new Uint8Array(0);
-        }
-      }
-    }
-
-    for (const { path, file } of organizedFiles) {
-      const fileContent = new Uint8Array(await file.arrayBuffer());
-      zipData[path] = fileContent;
-    }
-
-    try {
-      const zipped = zipSync(zipData, { level: 0 });
-      const zipBlob = new Blob([zipped.buffer], { type: "application/zip" });
-      saveAs(zipBlob, "archivos_organizados.zip");
-      toast.success("ZIP descargado");
-    } catch (error) {
-      toast.error("Error al generar el ZIP", {
-        description:
-          error instanceof Error ? error.message : "Error desconocido",
-      });
-    }
-  }, [organizedFiles]);
 
   const currentFile = origenFiles[selectedImageIndex];
   const imageUrl = currentFile ? URL.createObjectURL(currentFile) : null;
@@ -246,7 +194,6 @@ function App() {
           </div>
         </CardContent>
       </Card>
-      <Separator />
       <div className="grid grid-cols-3 gap-6">
         <Card className="col-span-2 image-preview">
           <CardHeader>
@@ -283,22 +230,7 @@ function App() {
           </CardContent>
         </Card>
       </div>
-      <Separator />
-      <Card className="folder-preview">
-        <CardHeader>
-          <CardTitle>Vista Previa de Carpeta</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-2">
-            <Button onClick={handleDownloadZip} className="w-fit">
-              Descargar Archivos Organizados (ZIP)
-            </Button>
-            <p className="text-sm">
-              Archivos organizados: {organizedFiles.length}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <FolderPreview organizedFiles={organizedFiles} />
     </div>
   );
 }

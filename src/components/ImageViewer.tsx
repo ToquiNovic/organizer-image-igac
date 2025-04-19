@@ -1,3 +1,4 @@
+// src/components/ImageViewer.tsx
 import { FC, memo, useState, useEffect, useRef } from "react";
 import { Button } from "../components/ui/button";
 import { CardContent } from "../components/ui/card";
@@ -30,30 +31,25 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
     rotation,
   }) => {
     const [pdfError, setPdfError] = useState<string | null>(null);
+    const [zoom, setZoom] = useState<number>(1);
     const defaultLayout = defaultLayoutPlugin();
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollPositionRef = useRef<number>(0);
 
-    // Dimensiones fijas para el contenedor
     const FIXED_WIDTH = 800;
     const FIXED_HEIGHT = 600;
 
-    // Normalizar el valor de rotation para que esté entre 0 y 360
     const normalizedRotation = rotation % 360;
 
-    // Ajustar las dimensiones del contenedor según la rotación
     useEffect(() => {
       const container = containerRef.current;
       if (!container) return;
 
-      // Guardar la posición de desplazamiento actual
       scrollPositionRef.current = window.scrollY;
 
-      // Determinar si la rotación requiere intercambiar las dimensiones
       const isRotated90or270 =
         normalizedRotation === 90 || normalizedRotation === 270;
 
-      // Asignar dimensiones fijas según la rotación
       if (isRotated90or270) {
         container.style.width = `${FIXED_HEIGHT}px`;
         container.style.height = `${FIXED_WIDTH}px`;
@@ -62,16 +58,13 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
         container.style.height = `${FIXED_HEIGHT}px`;
       }
 
-      // Forzar repintado sin cambiar la visibilidad
-      void container.getBoundingClientRect(); 
+      void container.getBoundingClientRect();
     }, [normalizedRotation]);
 
-    // Restaurar la posición de desplazamiento después del re-renderizado
     useEffect(() => {
       window.scrollTo(0, scrollPositionRef.current);
     }, [normalizedRotation]);
 
-    // Manejo de errores globales del Worker
     useEffect(() => {
       const handleError = (event: ErrorEvent) => {
         if (
@@ -85,7 +78,6 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
       return () => window.removeEventListener("error", handleError);
     }, []);
 
-    // Manejadores de eventos para los botones con preventDefault
     const handlePrev = (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       onPrev();
@@ -106,6 +98,10 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
       onNext();
     };
 
+    const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 3));
+    const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.2));
+    const handleResetZoom = () => setZoom(1);
+
     return (
       <div>
         <CardContent className="flex flex-col items-center w-full space-y-4">
@@ -116,12 +112,15 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
               <>
                 <Button onClick={handleRotateLeft}>Rotar Izquierda</Button>
                 <Button onClick={handleRotateRight}>Rotar Derecha</Button>
+                <Button onClick={handleZoomOut}>- Zoom</Button>
+                <Button onClick={handleResetZoom}>Reset Zoom</Button>
+                <Button onClick={handleZoomIn}>+ Zoom</Button>
               </>
             )}
             <Button onClick={handleNext}>Siguiente</Button>
           </div>
 
-          {/* Contenedor de la imagen */}
+          {/* Contenedor de la imagen o PDF */}
           {imageUrl ? (
             isPdf ? (
               <div className="w-full max-w-[800px] h-[600px] border p-2 bg-white">
@@ -138,25 +137,35 @@ export const ImageViewer: FC<ImageViewerProps> = memo(
                 )}
               </div>
             ) : (
-              <div className="w-full flex justify-center items-center border rounded bg-white p-2">
-                <div
-                  ref={containerRef}
-                  className="inline-block"
+              <div
+                ref={containerRef}
+                className="inline-block overflow-hidden"
+                style={{
+                  width:
+                    normalizedRotation === 90 || normalizedRotation === 270
+                      ? `${FIXED_HEIGHT}px`
+                      : `${FIXED_WIDTH}px`,
+                  height:
+                    normalizedRotation === 90 || normalizedRotation === 270
+                      ? `${FIXED_WIDTH}px`
+                      : `${FIXED_HEIGHT}px`,
+                }}
+              >
+                <img
+                  src={imageUrl ?? ""}
+                  alt={`Vista previa de ${imageUrl?.split("/").pop()}`}
+                  onError={(e) =>
+                    ((e.target as HTMLImageElement).src = "/fallback.jpg")
+                  }
+                  className="transition-transform duration-300"
                   style={{
-                    width: `${FIXED_WIDTH}px`, // Tamaño fijo inicial
-                    height: `${FIXED_HEIGHT}px`,
+                    transform: `rotate(${normalizedRotation}deg) scale(${zoom})`,
+                    transformOrigin: "center center",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
                   }}
-                >
-                  <img
-                    src={imageUrl}
-                    alt="Vista previa"
-                    className="w-full h-full object-contain transition-transform duration-300"
-                    style={{
-                      transform: `rotate(${normalizedRotation}deg)`,
-                      transformOrigin: "center center",
-                    }}
-                  />
-                </div>
+                />
               </div>
             )
           ) : (
