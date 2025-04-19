@@ -1,3 +1,4 @@
+// src/utils/file.ts
 import * as XLSX from "xlsx";
 import { IMG_CATEGORIES } from "./constants";
 
@@ -111,19 +112,22 @@ export async function organizeImage(
 export function checkUnidadExists(
   predio: string,
   category: string,
-  unidad: string,
+  unidad: string | null,
   organizedFiles: OrganizedFile[]
 ): boolean {
   const subcarpeta = isImageCategory(category) ? "03_img" : "02_doc_sop";
+  const unidadSegment = unidad ?? "sin_unidad";
 
-  const exists = organizedFiles.some((file) => {
-    const [filePredio, fileSubcarpeta, fileName] = file.path.split("/");
-    const isMatch =
+  return organizedFiles.some(({ path }) => {
+    const [filePredio, fileSubcarpeta, fileName] = path.split("/");
+
+    const nameWithoutExtension = fileName.split(".")[0]; // eliminar extensión
+    const expectedPrefix = `${predio}_${unidadSegment}_${category}`;
+
+    return (
       filePredio === predio &&
       fileSubcarpeta === subcarpeta &&
-      fileName.startsWith(`${predio}_${unidad}_`);
-    return isMatch;
+      nameWithoutExtension === expectedPrefix
+    );
   });
-
-  return exists;
 }

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { zipSync } from "fflate";
 import { saveAs } from "file-saver";
 import { SUBCARPETAS } from "../utils/constants";
+import { FolderOpen } from "lucide-react";
 
 interface OrganizedFile {
   path: string;
@@ -76,7 +77,10 @@ export default function FolderPreview({ organizedFiles }: FolderPreviewProps) {
             <ul className="text-xs space-y-1 max-h-40 overflow-auto">
               {organizedFiles.map((file, index) => (
                 <li key={index} className="truncate">
-                  📁 {file.path}
+                  <div className="flex items-center gap-2">
+                    <FolderOpen />
+                    <span className="truncate">{file.path}</span>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -1,3 +1,4 @@
+// src/components/PredioPanel.tsx
 import {
   useCallback,
   SetStateAction,
