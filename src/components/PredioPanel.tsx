@@ -62,11 +62,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
     const [selectedPredio, setSelectedPredio] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Depuración del estado del diálogo
-    useEffect(() => {
-      console.log("showDuplicateDialog actualizado:", showDuplicateDialog);
-    }, [showDuplicateDialog]);
-
     // Validación en tiempo real de newUnidad
     useEffect(() => {
       if (!newUnidad) {
@@ -109,7 +104,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
       (predio: string) => () => {
         setSelectedPredio(predio);
         setSearchTerm(predio);
-        console.log(`Predio seleccionado: ${predio}`);
       },
       []
     );
@@ -123,11 +117,8 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
         toast.error("Selecciona una categoría antes de organizar.");
         return;
       }
-      console.log(
-        `Organizando para predio: ${selectedPredio}, unidad: ${unidad}, categoría: ${category}`
-      );
       onSave(selectedPredio);
-    }, [selectedPredio, category, unidad, onSave]);
+    }, [selectedPredio, category, onSave]);
 
     const handleConfirmNewUnidad = useCallback(() => {
       if (!newUnidad) {
@@ -158,11 +149,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
         );
         return;
       }
-
-      // Acción correcta: nueva unidad válida y no duplicada
-      console.log(
-        `Confirmando nueva unidad: ${newUnidad} para predio: ${showDuplicateDialog}`
-      );
       setUnidad(newUnidad);
       setNewUnidad("");
       setError(null);
@@ -171,14 +157,10 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
       setShowDuplicateDialog(null);
       setTimeout(() => {
         setShowDuplicateDialog(null);
-        console.log("Forzando cierre del diálogo");
       }, 0);
 
       try {
         onSave(showDuplicateDialog);
-        console.log(
-          `Diálogo cerrado y onSave ejecutado para predio: ${showDuplicateDialog}, unidad: ${newUnidad}`
-        );
       } catch (error) {
         console.error("Error en onSave:", error);
         toast.error("Error al organizar el archivo");
@@ -271,7 +253,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
               setShowDuplicateDialog(null);
               setNewUnidad("");
               setError(null);
-              console.log("Diálogo cerrado por cancelar o clic fuera");
             }
           }}
         >
@@ -304,7 +285,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
                   setShowDuplicateDialog(null);
                   setNewUnidad("");
                   setError(null);
-                  console.log("Diálogo cerrado por botón Cancelar");
                 }}
               >
                 Cancelar

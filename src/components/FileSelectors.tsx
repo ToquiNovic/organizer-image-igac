@@ -1,5 +1,6 @@
 // src/components/FileSelectors.tsx
 import { ChangeEvent, FC } from "react";
+import { toast } from "sonner"; // ✅ importación añadida
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -19,6 +20,8 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
 }) => {
   const handleSelectFolder = async () => {
     try {
+      toast("Selecciona una carpeta en el siguiente diálogo del sistema"); // ✅ aviso previo
+
       const folderHandle: FileSystemDirectoryHandle = await (
         window as typeof window & {
           showDirectoryPicker: () => Promise<
@@ -45,6 +48,7 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
       onOrigenChange(files);
     } catch (error) {
       console.error("No se seleccionó una carpeta", error);
+      toast.error("No se pudo acceder a la carpeta. Intenta de nuevo."); // ✅ error
     }
   };
 

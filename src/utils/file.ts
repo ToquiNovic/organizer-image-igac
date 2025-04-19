@@ -94,7 +94,6 @@ export async function organizeImage(
       fileExtension ? `.${fileExtension}` : ""
     }`;
     const filePath = `${predio}/${subcarpetaDestino}/${finalFileName}`;
-    console.log("Generated filePath:", filePath);
     return {
       path: filePath,
       file: file,
