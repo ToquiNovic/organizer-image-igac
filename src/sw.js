@@ -1,7 +1,5 @@
-import { precacheAndRoute } from 'workbox-precaching';
-
 // Inyecta el manifiesto para que Workbox precachee los recursos
-precacheAndRoute(self.__WB_MANIFEST);
+self.__WB_MANIFEST;
 
 self.addEventListener("install", () => {
   self.skipWaiting();
