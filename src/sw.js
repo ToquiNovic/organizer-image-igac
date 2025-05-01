@@ -1,4 +1,5 @@
-// Inyecta el manifiesto para que Workbox precachee los recursos
+// sw.js
+// Marcador para que Workbox inyecte el manifiesto de precaché
 self.__WB_MANIFEST;
 
 self.addEventListener("install", () => {
