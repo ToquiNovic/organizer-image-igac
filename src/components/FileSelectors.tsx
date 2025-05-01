@@ -1,7 +1,5 @@
-// src/components/FileSelectors.tsx
 import { ChangeEvent, FC } from "react";
-import { toast } from "sonner"; // ✅ importación añadida
-import { Button } from "../components/ui/button";
+import { toast } from "sonner";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 
@@ -18,58 +16,49 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
   origenCount,
   excelFile,
 }) => {
-  const handleSelectFolder = async () => {
-    try {
-      toast("Selecciona una carpeta en el siguiente diálogo del sistema"); // ✅ aviso previo
+  const handleFolderSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files ?? []);
+    const validFiles = selectedFiles.filter((file) => {
+      const fileName = file.name.toLowerCase();
+      const isImage = fileName.match(/\.(jpg|jpeg|png|gif|bmp)$/) !== null;
+      const isPdf = fileName.endsWith(".pdf");
 
-      const folderHandle: FileSystemDirectoryHandle = await (
-        window as typeof window & {
-          showDirectoryPicker: () => Promise<
-            FileSystemDirectoryHandle & AsyncIterable<FileSystemHandle>
-          >;
-        }
-      ).showDirectoryPicker();
-
-      const files: File[] = [];
-
-      for await (const entry of folderHandle.values()) {
-        if (entry.kind === "file") {
-          const fileHandle = entry as FileSystemFileHandle;
-          const file = await fileHandle.getFile();
-          if (
-            file.name.toLowerCase().endsWith(".pdf") ||
-            file.type.startsWith("image/")
-          ) {
-            files.push(file);
-          }
-        }
+      if (!isImage && !isPdf) {
+        toast.error("Archivo no compatible", {
+          description: `El archivo ${file.name} no es una imagen ni un PDF.`,
+        });
       }
 
-      onOrigenChange(files);
-    } catch (error) {
-      console.error("No se seleccionó una carpeta", error);
-      toast.error("No se pudo acceder a la carpeta. Intenta de nuevo."); // ✅ error
+      return isImage || isPdf;
+    });
+
+    if (validFiles.length > 0) {
+      onOrigenChange(validFiles);
+      toast.success(`${validFiles.length} archivos seleccionados`);
+    } else {
+      toast.error("No se seleccionaron archivos válidos.");
     }
   };
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      {/* Sección: Carpeta de Origen */}
+      {/* Selección de carpeta con archivos */}
       <div className="space-y-2">
-        <Label htmlFor="folder-select" className="text-white">
-          Carpeta de Origen
+        <Label htmlFor="folder-picker" className="text-white">
+          Carpeta de Origen (Imágenes o PDFs)
         </Label>
-        <Button
-          id="folder-select"
-          onClick={handleSelectFolder}
-          className="w-full"
-        >
-          Seleccionar Carpeta
-        </Button>
-        <p className="text-sm ">{origenCount} archivos seleccionados</p>
+        <Input
+          id="folder-picker"
+          type="file"
+          multiple
+          // @ts-expect-error: webkitdirectory no está en la definición de tipo estándar
+          webkitdirectory="true"
+          onChange={handleFolderSelect}
+        />
+        <p className="text-sm">{origenCount} archivos seleccionados</p>
       </div>
 
-      {/* Sección: Excel File */}
+      {/* Excel File */}
       <div className="space-y-2">
         <Label htmlFor="excel-file">Archivo Excel</Label>
         <Input
@@ -78,7 +67,7 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
           accept=".xlsx"
           onChange={onExcelChange}
         />
-        <p className="text-sm ">
+        <p className="text-sm">
           {excelFile ? excelFile.name : "Ningún archivo seleccionado"}
         </p>
       </div>

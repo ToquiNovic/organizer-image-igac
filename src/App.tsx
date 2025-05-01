@@ -1,3 +1,4 @@
+// app.tsx
 import { useState, useCallback } from "react";
 import {
   ColumnSelector,
@@ -199,8 +200,8 @@ function App() {
         <div className="grid grid-cols-3 gap-6">
           <Card className="col-span-2 image-preview">
             <CardHeader>
-              <CardTitle className="text-white">
-                Vista Previa de Imagen
+              <CardTitle className="text-center">
+                Vista Previa de Imagen <strong>{currentFile?.name}</strong>
               </CardTitle>
             </CardHeader>
             <CardContent>

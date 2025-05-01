@@ -1,4 +1,3 @@
-// src/utils/file.ts
 import * as XLSX from "xlsx";
 import { IMG_CATEGORIES } from "./constants";
 
@@ -84,7 +83,8 @@ export async function organizeImage(
   file: File,
   predio: string,
   category: string,
-  unidad: string | null
+  unidad: string | null,
+  rotation: number = 0
 ): Promise<OrganizedFile> {
   try {
     const unidadSegment = unidad ?? "sin_unidad";
@@ -95,9 +95,54 @@ export async function organizeImage(
       fileExtension ? `.${fileExtension}` : ""
     }`;
     const filePath = `${predio}/${subcarpetaDestino}/${finalFileName}`;
+
+    let processedFile: File;
+
+    // Verifica si el archivo es una imagen
+    if (file.type.startsWith("image")) {
+      const imageBuffer = await file.arrayBuffer();
+      const img = new Image();
+      const blob = new Blob([imageBuffer]);
+      const url = URL.createObjectURL(blob);
+      img.src = url;
+
+      processedFile = await new Promise((resolve, reject) => {
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("No se pudo obtener el contexto del canvas."));
+            return;
+          }
+
+          // Establecer las dimensiones del canvas
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Si hay rotación, aplicar
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate((rotation * Math.PI) / 180);
+          ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+          // Convertir a formato JPEG
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: "image/jpeg" }));
+            } else {
+              reject(new Error("No se pudo convertir la imagen."));
+            }
+          }, "image/jpeg");
+        };
+
+        img.onerror = reject;
+      });
+    } else {
+      processedFile = file;
+    }
+
     return {
       path: filePath,
-      file: file,
+      file: processedFile,
     };
   } catch (error) {
     console.error("Error al organizar la imagen:", error);
