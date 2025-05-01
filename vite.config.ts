@@ -58,11 +58,12 @@ export default defineConfig({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        globPatterns: ["**/*.{js,css,html,png,jpg,jpeg,svg}"],
       },
-      injectRegister: "script",
-      srcDir: "src",
-      filename: "sw.js",
-      strategies: "injectManifest",
+      registerType: "autoUpdate",
+      devOptions: {
+        enabled: true,
+      },
     }),
   ],
   resolve: {
