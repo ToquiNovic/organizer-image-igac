@@ -31,8 +31,9 @@ import { Input } from "../components/ui/input";
 import { OrganizedFile } from "../utils/file";
 import { toast } from "sonner";
 import { checkUnidadExists } from "../utils/file";
-import { Search } from "lucide-react";
+import { Search, XCircle } from "lucide-react";
 import { CardFooter } from "../components/ui/card";
+import { Switch } from "../components/ui/switch";
 
 interface PredioPanelProps {
   predios: string[];
@@ -62,6 +63,7 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
     const [error, setError] = useState<string | null>(null);
     const [selectedPredio, setSelectedPredio] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [isMultipleSelection, setIsMultipleSelection] = useState(false); // Estado del switch
 
     // Validación en tiempo real de newUnidad
     useEffect(() => {
@@ -185,10 +187,20 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar predio..."
-            className="pl-10 w-full"
+            className="pl-10 pr-10 w-full"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
+          {/* Botón de limpiar */}
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              <XCircle className="h-5 w-5" />
+            </button>
+          )}
         </div>
+
         <ScrollArea className="max-h-[300px] overflow-auto">
           <ul role="listbox" aria-label="Lista de predios">
             {filteredPredios.length > 0 ? (
@@ -233,10 +245,41 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
             </SelectContent>
           </Select>
         </div>
-        <div className="mt-2 space-y-1">
+
+        <div className="mt-4">
           <Label>Unidad Construcción</Label>
           <p className="text-sm font-medium">{unidad}</p>
         </div>
+
+        {/* Switch para activar/desactivar unidad */}
+        <div className="mt-4 flex items-center gap-2">
+          <Label htmlFor="multiple-selection" className="mb-0">
+            Ingresar unidad
+          </Label>
+          <Switch
+            id="multiple-selection"
+            checked={isMultipleSelection}
+            onCheckedChange={setIsMultipleSelection}
+          />
+        </div>
+
+        {/* Si el switch está activado, mostrar la opción de ingresar nueva unidad */}
+        {isMultipleSelection && (
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="new-unidad">Nueva unidad</Label>
+            <Input
+              id="new-unidad"
+              type="text"
+              value={newUnidad}
+              onChange={(e) => setNewUnidad(e.target.value.toUpperCase())}
+              placeholder="Ej. B"
+              className="w-full"
+              maxLength={1}
+            />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </div>
+        )}
+
         <CardFooter className="mt-4 p-0">
           <Button
             onClick={handleOrganize}
