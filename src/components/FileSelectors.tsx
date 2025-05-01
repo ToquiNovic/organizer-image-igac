@@ -1,3 +1,4 @@
+// src/components/FileSelectors.tsx
 import { ChangeEvent, FC } from "react";
 import { toast } from "sonner";
 import { Input } from "../components/ui/input";
@@ -10,6 +11,10 @@ interface FileSelectorsProps {
   excelFile: File | null;
 }
 
+interface FileWithPath extends File {
+  webkitRelativePath: string;
+}
+
 export const FileSelectors: FC<FileSelectorsProps> = ({
   onOrigenChange,
   onExcelChange,
@@ -17,20 +22,23 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
   excelFile,
 }) => {
   const handleFolderSelect = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files ?? []);
-    const validFiles = selectedFiles.filter((file) => {
-      const fileName = file.name.toLowerCase();
-      const isImage = fileName.match(/\.(jpg|jpeg|png|gif|bmp)$/) !== null;
-      const isPdf = fileName.endsWith(".pdf");
+    const selectedFiles = Array.from(e.target.files ?? []) as FileWithPath[];
 
-      if (!isImage && !isPdf) {
-        toast.error("Archivo no compatible", {
-          description: `El archivo ${file.name} no es una imagen ni un PDF.`,
-        });
-      }
+    const validFiles = selectedFiles
+      .filter((file) => {
+        const fileName = file.name.toLowerCase();
+        const isImage = fileName.match(/\.(jpg|jpeg|png|gif|bmp)$/) !== null;
+        const isPdf = fileName.endsWith(".pdf");
 
-      return isImage || isPdf;
-    });
+        if (!isImage && !isPdf) {
+          toast.error("Archivo no compatible", {
+            description: `El archivo ${file.name} no es una imagen ni un PDF.`,
+          });
+        }
+
+        return isImage || isPdf;
+      })
+      .sort((a, b) => a.webkitRelativePath.localeCompare(b.webkitRelativePath));
 
     if (validFiles.length > 0) {
       onOrigenChange(validFiles);
