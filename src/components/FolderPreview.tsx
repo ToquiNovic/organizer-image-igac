@@ -5,7 +5,16 @@ import { toast } from "sonner";
 import { zipSync } from "fflate";
 import { saveAs } from "file-saver";
 import { SUBCARPETAS } from "../utils/constants";
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, Trash } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "./ui/dialog";
+import { useState } from "react";
 
 interface OrganizedFile {
   path: string;
@@ -14,9 +23,16 @@ interface OrganizedFile {
 
 interface FolderPreviewProps {
   organizedFiles: OrganizedFile[];
+  setOrganizedFiles: React.Dispatch<React.SetStateAction<OrganizedFile[]>>;
 }
 
-export default function FolderPreview({ organizedFiles }: FolderPreviewProps) {
+export default function FolderPreview({
+  organizedFiles,
+  setOrganizedFiles,
+}: FolderPreviewProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null);
+  const [fileToDelete, setFileToDelete] = useState<OrganizedFile | null>(null);
+
   const handleDownloadZip = async () => {
     if (organizedFiles.length === 0) {
       toast.error("No hay archivos organizados", {
@@ -55,6 +71,11 @@ export default function FolderPreview({ organizedFiles }: FolderPreviewProps) {
     }
   };
 
+  const handleDeleteFile = (file: OrganizedFile) => {
+    setOrganizedFiles((prev) => prev.filter((f) => f !== file));
+    toast.success("Archivo eliminado exitosamente");
+  };
+
   return (
     <Card className="folder-preview">
       <CardHeader>
@@ -76,17 +97,64 @@ export default function FolderPreview({ organizedFiles }: FolderPreviewProps) {
           ) : (
             <ul className="text-xs space-y-1 max-h-40 overflow-auto">
               {organizedFiles.map((file, index) => (
-                <li key={index} className="truncate">
+                <li
+                  key={index}
+                  className="truncate flex items-center justify-between"
+                >
                   <div className="flex items-center gap-2">
                     <FolderOpen />
                     <span className="truncate">{file.path}</span>
                   </div>
+                  <Button
+                    variant="destructive"
+                    className="p-1 ml-2"
+                    onClick={() => {
+                      setFileToDelete(file); // Establecer el archivo a eliminar
+                      setShowDeleteDialog(file.path); // Mostrar el diálogo de confirmación
+                    }}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </CardContent>
+
+      {/* Diálogo de confirmación de eliminación */}
+      <Dialog
+        open={!!showDeleteDialog}
+        onOpenChange={(open) => !open && setShowDeleteDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas eliminar este archivo?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(null)} // Cerrar el diálogo
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (fileToDelete) {
+                  handleDeleteFile(fileToDelete); // Eliminar el archivo
+                }
+                setShowDeleteDialog(null); // Cerrar el diálogo
+              }}
+            >
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

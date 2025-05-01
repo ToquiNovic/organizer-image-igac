@@ -235,7 +235,7 @@ function App() {
             </CardContent>
           </Card>
         </div>
-        <FolderPreview organizedFiles={organizedFiles} />
+        <FolderPreview organizedFiles={organizedFiles} setOrganizedFiles={setOrganizedFiles} />
       </TooltipProvider>
     </div>
   );
