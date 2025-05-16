@@ -1,4 +1,3 @@
-// src/components/PredioPanel.tsx
 import {
   useCallback,
   SetStateAction,
@@ -8,8 +7,6 @@ import {
   useState,
   useEffect,
 } from "react";
-import { OPTIONS } from "../utils";
-import { ScrollArea } from "../components/ui/scroll-area";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import {
@@ -19,21 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { OrganizedFile } from "../utils/file";
 import { toast } from "sonner";
 import { checkUnidadExists } from "../utils/file";
 import { Search, XCircle } from "lucide-react";
-import { CardFooter } from "../components/ui/card";
-import { Switch } from "../components/ui/switch";
+import { OPTIONS } from "../utils";
 
 interface PredioPanelProps {
   predios: string[];
@@ -43,8 +31,8 @@ interface PredioPanelProps {
   unidad: string;
   setUnidad: Dispatch<SetStateAction<string>>;
   organizedFiles: OrganizedFile[];
-  showDuplicateDialog: string | null;
-  setShowDuplicateDialog: Dispatch<SetStateAction<string | null>>;
+  showDuplicateDialog?: string | null;
+  setShowDuplicateDialog?: Dispatch<SetStateAction<string | null>>;
 }
 
 export const PredioPanel: FC<PredioPanelProps> = memo(
@@ -56,47 +44,43 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
     unidad,
     setUnidad,
     organizedFiles,
-    showDuplicateDialog,
-    setShowDuplicateDialog,
-  }) => {
-    const [newUnidad, setNewUnidad] = useState("");
+  }: PredioPanelProps) => {
     const [error, setError] = useState<string | null>(null);
     const [selectedPredio, setSelectedPredio] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [isMultipleSelection, setIsMultipleSelection] = useState(false); // Estado del switch
 
-    // Validación en tiempo real de newUnidad
+    // Validar unidad en tiempo real
     useEffect(() => {
-      if (!newUnidad) {
+      if (!unidad) {
         setError(null);
         return;
       }
 
-      if (!/^[A-Z]$/.test(newUnidad)) {
+      if (!/^[A-Z]$/.test(unidad)) {
         setError("La unidad debe ser una sola letra mayúscula (A-Z).");
         return;
       }
 
-      if (!showDuplicateDialog) {
+      if (!selectedPredio) {
         setError("No se ha seleccionado un predio.");
         return;
       }
 
       const unidadExists = checkUnidadExists(
-        showDuplicateDialog,
+        selectedPredio,
         category,
-        newUnidad,
+        unidad,
         organizedFiles
       );
 
       if (unidadExists) {
         setError(
-          `La unidad ${newUnidad} ya existe para este predio. Ingresa otra.`
+          `La unidad ${unidad} ya existe para este predio. Ingresa otra.`
         );
       } else {
         setError(null);
       }
-    }, [newUnidad, showDuplicateDialog, category, organizedFiles]);
+    }, [unidad, selectedPredio, category, organizedFiles]);
 
     // Filtrar predios según el término de búsqueda
     const filteredPredios = predios.filter((predio) =>
@@ -113,70 +97,35 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
 
     const handleOrganize = useCallback(() => {
       if (!selectedPredio) {
-        toast.error("Selecciona un predio antes de organizar.");
+        toast.error("Seleccione un predio");
         return;
       }
       if (!category) {
-        toast.error("Selecciona una categoría antes de organizar.");
+        toast.error("Seleccione una categoría");
         return;
       }
-      onSave(selectedPredio);
-    }, [selectedPredio, category, onSave]);
-
-    const handleConfirmNewUnidad = useCallback(() => {
-      if (!newUnidad) {
-        setError("Por favor, ingresa una nueva unidad.");
-        return;
-      }
-
-      if (!/^[A-Z]$/.test(newUnidad)) {
-        setError("La unidad debe ser una sola letra mayúscula (A-Z).");
-        return;
-      }
-
-      if (!showDuplicateDialog) {
-        setError("No se ha seleccionado un predio.");
+      if (!unidad || unidad.trim() === "") {
+        toast.error("Ingrese una unidad válida");
         return;
       }
 
       const unidadExists = checkUnidadExists(
-        showDuplicateDialog,
+        selectedPredio,
         category,
-        newUnidad,
+        unidad,
         organizedFiles
       );
 
       if (unidadExists) {
-        setError(
-          `La unidad ${newUnidad} ya existe para este predio. Ingresa otra.`
-        );
+        setError(`La unidad ${unidad} ya existe para este predio.`);
+        toast.error(`La unidad ${unidad} ya existe para este predio.`);
         return;
       }
-      setUnidad(newUnidad);
-      setNewUnidad("");
-      setError(null);
 
-      // Forzar el cierre del diálogo
-      setShowDuplicateDialog(null);
-      setTimeout(() => {
-        setShowDuplicateDialog(null);
-      }, 0);
-
-      try {
-        onSave(showDuplicateDialog);
-      } catch (error) {
-        console.error("Error en onSave:", error);
-        toast.error("Error al organizar el archivo");
-      }
-    }, [
-      newUnidad,
-      category,
-      organizedFiles,
-      showDuplicateDialog,
-      setUnidad,
-      setShowDuplicateDialog,
-      onSave,
-    ]);
+      // Todo válido, guardar
+      onSave(selectedPredio);
+      toast.success("Unidad organizada exitosamente");
+    }, [selectedPredio, unidad, category, organizedFiles, onSave]);
 
     return (
       <div className="w-64">
@@ -190,7 +139,6 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
             className="pl-10 pr-10 w-full"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
-          {/* Botón de limpiar */}
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
@@ -201,7 +149,7 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
           )}
         </div>
 
-        <ScrollArea className="max-h-[300px] overflow-auto">
+        <div className="max-h-[300px] overflow-auto">
           <ul role="listbox" aria-label="Lista de predios">
             {filteredPredios.length > 0 ? (
               filteredPredios.map((predio, i) => (
@@ -223,7 +171,8 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
               <li className="p-2 text-gray-500">No se encontraron predios</li>
             )}
           </ul>
-        </ScrollArea>
+        </div>
+
         <div className="mt-2 space-y-1">
           <Label htmlFor="category-select">Categoría</Label>
           <Select value={category} onValueChange={setCategory}>
@@ -248,95 +197,29 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
 
         <div className="mt-4">
           <Label>Unidad Construcción</Label>
-          <p className="text-sm font-medium">{unidad}</p>
-        </div>
-
-        {/* Switch para activar/desactivar unidad */}
-        <div className="mt-4 flex items-center gap-2">
-          <Label htmlFor="multiple-selection" className="mb-0">
-            Ingresar unidad
-          </Label>
-          <Switch
-            id="multiple-selection"
-            checked={isMultipleSelection}
-            onCheckedChange={setIsMultipleSelection}
-          />
-        </div>
-
-        {/* Si el switch está activado, mostrar la opción de ingresar nueva unidad */}
-        {isMultipleSelection && (
           <div className="mt-4 space-y-2">
-            <Label htmlFor="new-unidad">Nueva unidad</Label>
             <Input
-              id="new-unidad"
+              id="unidad"
               type="text"
-              value={newUnidad}
-              onChange={(e) => setNewUnidad(e.target.value.toUpperCase())}
+              value={unidad}
+              onChange={(e) => setUnidad(e.target.value.toUpperCase())}
               placeholder="Ej. B"
               className="w-full"
               maxLength={1}
             />
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
-        )}
+        </div>
 
-        <CardFooter className="mt-4 p-0">
+        <div className="mt-4 p-0">
           <Button
             onClick={handleOrganize}
-            disabled={!selectedPredio || !category}
+            disabled={!selectedPredio || !category || !unidad}
             className="w-full"
           >
             Ordenar
           </Button>
-        </CardFooter>
-
-        <Dialog
-          open={!!showDuplicateDialog}
-          onOpenChange={(open) => {
-            if (!open) {
-              setShowDuplicateDialog(null);
-              setNewUnidad("");
-              setError(null);
-            }
-          }}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Unidad duplicada</DialogTitle>
-              <DialogDescription>
-                La unidad <strong>{unidad}</strong> ya existe en la subcarpeta
-                para el predio <strong>{showDuplicateDialog}</strong>. Ingresa
-                una nueva unidad.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-2">
-              <Label htmlFor="new-unidad">Nueva unidad</Label>
-              <Input
-                id="new-unidad"
-                type="text"
-                value={newUnidad}
-                onChange={(e) => setNewUnidad(e.target.value.toUpperCase())}
-                placeholder="Ej. B"
-                className="w-full"
-                maxLength={1}
-              />
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowDuplicateDialog(null);
-                  setNewUnidad("");
-                  setError(null);
-                }}
-              >
-                Cancelar
-              </Button>
-              <Button onClick={handleConfirmNewUnidad}>Confirmar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        </div>
       </div>
     );
   }
