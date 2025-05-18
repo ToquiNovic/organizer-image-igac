@@ -51,9 +51,9 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* Selección de carpeta con archivos */}
-      <div className="space-y-2">
-        <Label htmlFor="folder-picker" className="text-white">
-          Carpeta de Origen (Imágenes o PDFs)
+      <div className="space-y-2" id="step-origen">
+        <Label htmlFor="folder-picker">
+          Carpeta de Origen (Imágenes y/o PDFs)
         </Label>
         <Input
           id="folder-picker"
@@ -67,7 +67,7 @@ export const FileSelectors: FC<FileSelectorsProps> = ({
       </div>
 
       {/* Excel File */}
-      <div className="space-y-2">
+      <div className="space-y-2" id="step-excel">
         <Label htmlFor="excel-file">Archivo Excel</Label>
         <Input
           id="excel-file"

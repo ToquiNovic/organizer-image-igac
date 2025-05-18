@@ -17,6 +17,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { toast, Toaster } from "sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { startTour } from "./helpers/tour.helper";
+import { Button } from "./components/ui/button";
+import { Cover } from "./components/ui/cover";
 
 function App() {
   const [origenFiles, setOrigenFiles] = useState<File[]>([]);
@@ -170,16 +173,19 @@ function App() {
   const imageUrl = currentFile ? URL.createObjectURL(currentFile) : null;
 
   return (
-    <div className="grid h-screen p-6 gap-6">
+    <div className="grid h-screen p-4 gap-4">
       <TooltipProvider>
         <Toaster richColors position="top-right" />
-        <Card className="start-panel">
+        <Card className="start-panel" id="step-pictures">
           <CardHeader>
+            <Button variant="ghost" onClick={startTour}>
+              ¿Cómo funciona?
+            </Button>
             <CardTitle>Panel de Inicio</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2">
+              <div className="col-span-2" id="step-archivos">
                 <FileSelectors
                   onOrigenChange={handleOrigenChange}
                   onExcelChange={handleExcelChange}
@@ -187,7 +193,7 @@ function App() {
                   excelFile={excelFile}
                 />
               </div>
-              <div className="col-span-1">
+              <div id="step-columnas" className="col-span-1">
                 <ColumnSelector
                   excelColumns={excelColumns}
                   selectedColumn={selectedColumn}
@@ -198,7 +204,7 @@ function App() {
           </CardContent>
         </Card>
         <div className="grid grid-cols-3 gap-6">
-          <Card className="col-span-2 image-preview">
+          <Card className="col-span-2 image-preview" id="step-imagen">
             <CardHeader>
               <CardTitle className="text-center">
                 Vista Previa de Imagen <strong>{currentFile?.name}</strong>
@@ -216,7 +222,7 @@ function App() {
               />
             </CardContent>
           </Card>
-          <Card className="predio-panel">
+          <Card className="predio-panel" id="step-predio">
             <CardHeader>
               <CardTitle>Panel de Predios</CardTitle>
             </CardHeader>
@@ -235,8 +241,14 @@ function App() {
             </CardContent>
           </Card>
         </div>
-        <FolderPreview organizedFiles={organizedFiles} setOrganizedFiles={setOrganizedFiles} />
+        <div id="step-preview">
+          <FolderPreview
+            organizedFiles={organizedFiles}
+            setOrganizedFiles={setOrganizedFiles}
+          />
+        </div>
       </TooltipProvider>
+      <Cover>Toqui</Cover>
     </div>
   );
 }

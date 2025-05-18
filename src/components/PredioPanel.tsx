@@ -130,7 +130,7 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
     return (
       <div className="w-64">
         <h3 className="text-lg font-semibold mb-2">Predios</h3>
-        <div className="relative mb-2">
+        <div className="relative mb-2" id="step-lista-predios">
           <Input
             type="text"
             value={searchTerm}
@@ -173,12 +173,12 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
           </ul>
         </div>
 
-        <div className="mt-2 space-y-1">
+        <div className="mt-2 space-y-1" id="step-categoria">
           <Label htmlFor="category-select">Categoría</Label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger
               id="category-select"
-              className="w-full border-none shadow-none"
+              className="w-full shadow-none"
             >
               <SelectValue placeholder="Seleccionar categoría" />
             </SelectTrigger>
@@ -195,7 +195,7 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
           </Select>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4" id="step-unidad">
           <Label>Unidad Construcción</Label>
           <div className="mt-4 space-y-2">
             <Input
@@ -211,7 +211,7 @@ export const PredioPanel: FC<PredioPanelProps> = memo(
           </div>
         </div>
 
-        <div className="mt-4 p-0">
+        <div className="mt-4 p-0" id="step-organizar">
           <Button
             onClick={handleOrganize}
             disabled={!selectedPredio || !category || !unidad}

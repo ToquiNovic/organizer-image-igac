@@ -83,42 +83,48 @@ export default function FolderPreview({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-2">
-          <Button onClick={handleDownloadZip} className="w-fit">
+          <Button
+            onClick={handleDownloadZip}
+            className="w-fit"
+            id="step-download"
+          >
             Descargar Archivos Organizados (ZIP)
           </Button>
-          <p className="text-sm">
-            Archivos organizados: {organizedFiles.length}
-          </p>
-          <p className="text-sm mb-2">Lista de Archivos Organizados: </p>
-          {organizedFiles.length === 0 ? (
-            <p className="text-muted-foreground text-xs">
-              No hay imágenes organizadas aún.
+          <div id="step-lista-archivos">
+            <p className="text-sm">
+              Archivos organizados: {organizedFiles.length}
             </p>
-          ) : (
-            <ul className="text-xs space-y-1 max-h-40 overflow-auto">
-              {organizedFiles.map((file, index) => (
-                <li
-                  key={index}
-                  className="truncate flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <FolderOpen />
-                    <span className="truncate">{file.path}</span>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    className="p-1 ml-2"
-                    onClick={() => {
-                      setFileToDelete(file); // Establecer el archivo a eliminar
-                      setShowDeleteDialog(file.path); // Mostrar el diálogo de confirmación
-                    }}
+            <p className="text-sm mb-2">Lista de Archivos Organizados: </p>
+            {organizedFiles.length === 0 ? (
+              <p className="text-muted-foreground text-xs">
+                No hay imágenes organizadas aún.
+              </p>
+            ) : (
+              <ul className="text-xs space-y-1 max-h-40 overflow-auto">
+                {organizedFiles.map((file, index) => (
+                  <li
+                    key={index}
+                    className="truncate flex items-center justify-between"
                   >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
+                    <div className="flex items-center gap-2">
+                      <FolderOpen />
+                      <span className="truncate">{file.path}</span>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="p-1 ml-2"
+                      onClick={() => {
+                        setFileToDelete(file); // Establecer el archivo a eliminar
+                        setShowDeleteDialog(file.path); // Mostrar el diálogo de confirmación
+                      }}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </CardContent>
 
