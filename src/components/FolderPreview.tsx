@@ -61,7 +61,7 @@ export default function FolderPreview({
     try {
       const zipped = zipSync(zipData, { level: 0 });
       const zipBlob = new Blob([zipped.buffer], { type: "application/zip" });
-      saveAs(zipBlob, "archivos_organizados.zip");
+      saveAs(zipBlob, "01_especif.zip");
       toast.success("ZIP descargado");
     } catch (error) {
       toast.error("Error al generar el ZIP", {
