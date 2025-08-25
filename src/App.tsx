@@ -178,7 +178,7 @@ function App() {
         <Toaster richColors position="top-right" />
         <Card className="start-panel" id="step-pictures">
           <CardHeader>
-            <Button variant="ghost" onClick={startTour}>
+            <Button variant="outline" onClick={startTour} id="step-tour">
               ¿Cómo funciona?
             </Button>
             <CardTitle>Panel de Inicio</CardTitle>
